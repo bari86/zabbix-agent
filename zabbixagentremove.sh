@@ -13,9 +13,10 @@ rm -rvf /etc/zabbix
 function version_ubuntu_debian()
 {
 service zabbix-agent stop
-apt remove  zabbix-agent* -y
+apt remove zabbix-agent* -y
 apt remove zabbix-release* -y
 rm -rvf /etc/zabbix
+apt purge zabbix-agent* -y
 }
 
 
@@ -70,4 +71,3 @@ echo Thanks for using Bari"'"s zabbix-agent removal script
 echo Host to be removed from Front End : $(hostname -f)
 
 echo ==========================================================
-
