@@ -1,6 +1,13 @@
 #!/bin/bash
 
+# Please put in your Zabbix Server IP
+SERVERIP="127.0.0.1"
 
+# Zabbix Host name will be using the server hostname by default. Alternatively comment here and use below
+ZABBIXHOSTNAME="$(hostname -f)"
+
+# Zabbix Custom Host name
+# ZABBIXHOSTNAME="Custom Name Here"
 
 # Step 1 = Determines the OS Distribution
 # Step 2 = Determines the OS Version ID
@@ -18,9 +25,9 @@ echo ========================================================================
 
 mv /etc/zabbix/zabbix_agentd.conf /etc/zabbix/zabbix_agentd.conf.original
 cp /etc/zabbix/zabbix_agentd.conf.original /etc/zabbix/zabbix_agentd.conf	
-sed -i "s+Server=127.0.0.1+Server=ENTERYOURZABBIXSERVERIP+g" /etc/zabbix/zabbix_agentd.conf
-sed -i "s+ServerActive=127.0.0.1+ServerActive=ENTERYOURZABBIXSERVERIP:10051+g" /etc/zabbix/zabbix_agentd.conf
-sed -i "s+Hostname=Zabbix server+Hostname=$(hostname -f)+g" /etc/zabbix/zabbix_agentd.conf
+sed -i "s+Server=127.0.0.1+Server=$SERVERIP+g" /etc/zabbix/zabbix_agentd.conf
+sed -i "s+ServerActive=127.0.0.1+ServerActive=$SERVERIP:10051+g" /etc/zabbix/zabbix_agentd.conf
+sed -i "s+Hostname=Zabbix server+Hostname=$ZABBIXHOSTNAME+g" /etc/zabbix/zabbix_agentd.conf
 sed -i "s+# Timeout=3+Timeout=30+g" /etc/zabbix/zabbix_agentd.conf
 
 echo ========================================================================
@@ -372,11 +379,10 @@ fi
 echo ========================================================================
 echo Congrats. Zabbix-Agent Installion is completed successfully.
 echo Zabbix-Agent is installed, started and enabled to be up post reboot on this machine.
-echo You can now add the host $(hostname -f) with IP $(hostname -i) on the Zabbix-Server Front End.
+echo You can now add the host $ZABBIXHOSTNAME with IP $(hostname -i) on the Zabbix-Server Front End.
 echo Thanks for using Bari"'"s zabbix-agent installation script.
 echo ========================================================================
 echo To check zabbix-agent service status, you may run : service zabbix-agent status
 echo To check zabbix-agent config, you may run : egrep -v '"^#|^$"' /etc/zabbix/zabbix_agentd.conf
 echo To check zabbix-agent logs, you may run : tail -f /var/log/zabbix/zabbix_agentd.log
 echo ========================================================================
-
