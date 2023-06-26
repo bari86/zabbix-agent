@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# Please put in your Zabbix Server IP
+# Please put in your Zabbix Server IP.
 SERVERIP="127.0.0.1"
 
-# Zabbix Host name will be using the server hostname by default. Alternatively comment here and use below
-ZABBIXHOSTNAME="$(hostname -f)"
+# Please put in your Zabbix Host name here. Alternatively you can comment the first line and uncomment the second line for it to use the server hostname.
+ZABBIXHOSTNAME="CustomNameHere"
+# ZABBIXHOSTNAME="$(hostname -f)"
 
-# Zabbix Custom Host name
-# ZABBIXHOSTNAME="Custom Name Here"
+# Script starts
 
 # Step 1 = Determines the OS Distribution
 # Step 2 = Determines the OS Version ID
@@ -381,6 +381,7 @@ echo Congrats. Zabbix-Agent Installion is completed successfully.
 echo Zabbix-Agent is installed, started and enabled to be up post reboot on this machine.
 echo You can now add the host $ZABBIXHOSTNAME with IP $(hostname -i) on the Zabbix-Server Front End.
 echo Thanks for using Bari"'"s zabbix-agent installation script.
+echo Visit https://github.com/bari86/zabbix-agent for more information.
 echo ========================================================================
 echo To check zabbix-agent service status, you may run : service zabbix-agent status
 echo To check zabbix-agent config, you may run : egrep -v '"^#|^$"' /etc/zabbix/zabbix_agentd.conf
