@@ -1,25 +1,35 @@
 #!/bin/bash
 
 # Zabbix Auto Install Script With Autoregistration
-# Version 0.5
+# Version 0.6
+
 
 # Please put in your Zabbix Server IP.
 SERVERIP="127.0.0.1"
 
+
 # Please put in your Zabbix Host Monitoring name here.
-ZABBIXHOSTNAME="CustomNameHere"
-# ZABBIXHOSTNAME="$(hostname -f)" # Alternatively you can comment the first line and uncomment the second line for it to use the server hostname.
+ZABBIXHOSTNAME="CustomNameHere" # Default. Alternative method below.
+
+# ZABBIXHOSTNAME="$(hostname -f)" # Alternative 1. You can use the server hostname instead.
+
+# ZABBIXHOSTNAMEFILELOCATION=/home/yourhostname.txt # Alternative 2. You can define your hostname based on txt file instead.
+# ZABBIXHOSTNAME=$(cat $ZABBIXHOSTNAMEFILELOCATION)
+
 
 # Enable PSK Encryption Host.
 ZABBIXTLSIDENTITY=$ZABBIXHOSTNAME # Your PSK identity. Please use this value in your Zabbix Server > Monitor > Add Host > Encryption > PSK.
 # ZABBIXTLSIDENTITY="YourPSKIdentity" # Alternative PSK identity. You can comment above and use custom value instead.
 
+
 # PSK Secret path location.
 ZABBIXTLSFILELOCATION=/etc/zabbix/zabbix_secret.psk
+
 
 # Auto Registration Host.
 ZABBIXPSKSECRET=YOURRANDOMHEX # Your PSK value. Please use this value in your Zabbix > Administration > General > Autoregistration.
 ZABBIXHOSTMETADATA="YourHostMetadata" # Your Host Metadata value. Please use this value in your Zabbix Server > Configuration > Actions > Autoregistration action
+
 
 
 
@@ -58,7 +68,7 @@ echo ========================================================================
 
 touch $ZABBIXTLSFILELOCATION
 echo $ZABBIXPSKSECRET > $ZABBIXTLSFILELOCATION
-# openssl rand -hex 32 > $ZABBIXTLSFILELOCATION # To use random PSK value. Need to comment out line 59, 60, 21, which are 'touch $ZABBIXTLSFILELOCATION', 'echo $ZABBIXPSKSECRET > $ZABBIXTLSFILELOCATION', 'ZABBIXPSKSECRET=YOURRANDOMHEX'
+# openssl rand -hex 32 > $ZABBIXTLSFILELOCATION # Alternative method. To use random PSK value instead. Need to comment out line 69, 70, 30, which are 'touch $ZABBIXTLSFILELOCATION', 'echo $ZABBIXPSKSECRET > $ZABBIXTLSFILELOCATION', 'ZABBIXPSKSECRET=YOURRANDOMHEX'
 chown zabbix:zabbix $ZABBIXTLSFILELOCATION
 chmod 640 $ZABBIXTLSFILELOCATION
 sed -i "s+# TLSConnect=unencrypted+TLSConnect=psk+g" /etc/zabbix/zabbix_agentd.conf
