@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Zabbix Auto Install Script
+# Version 0.4
+
 # Please put in your Zabbix Server IP.
 SERVERIP="127.0.0.1"
 
