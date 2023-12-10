@@ -1,43 +1,40 @@
 #!/bin/bash
 
-# Zabbix Auto Install Script With Autoregistration
-# Version 0.6
+# Zabbix Auto Install Script With Auto Registration
+# Version Control V1.0
 
+# Please put in your Zabbix Host Monitoring name here.
+ZABBIXHOSTNAME="YourHostNameHere" # Put in VM name where. This value appear exactly in Zabbix Host.
+
+# Change the PSK identity if needed. This is will be reflected on the Zabbix > Host > Host Group.
+ZABBIXTLSIDENTITY="Infrastructure" # Your PSK identity for SoothSayer.
 
 # Please put in your Zabbix Server IP.
 SERVERIP="127.0.0.1"
 
-
-# Please put in your Zabbix Host Monitoring name here.
-ZABBIXHOSTNAME="CustomNameHere" # Default. Alternative method below.
-
-# ZABBIXHOSTNAME="$(hostname -f)" # Alternative 1. You can use the server hostname instead.
-
-# ZABBIXHOSTNAMEFILELOCATION=/home/yourhostname.txt # Alternative 2. You can define your hostname based on txt file instead.
-# ZABBIXHOSTNAME=$(cat $ZABBIXHOSTNAMEFILELOCATION)
-
-
-# Enable PSK Encryption Host.
-ZABBIXTLSIDENTITY=$ZABBIXHOSTNAME # Your PSK identity. Please use this value in your Zabbix Server > Monitor > Add Host > Encryption > PSK.
-# ZABBIXTLSIDENTITY="YourPSKIdentity" # Alternative PSK identity. You can comment above and use custom value instead.
-
-
 # PSK Secret path location.
 ZABBIXTLSFILELOCATION=/etc/zabbix/zabbix_secret.psk
 
-
 # Auto Registration Host.
-ZABBIXPSKSECRET=YOURRANDOMHEX # Your PSK value. Please use this value in your Zabbix > Administration > General > Autoregistration.
-ZABBIXHOSTMETADATA="YourHostMetadata" # Your Host Metadata value. Please use this value in your Zabbix Server > Configuration > Actions > Autoregistration action
+ZABBIXPSKSECRET="YourPSKValueHere" # Your PSK value. Please use this value in your Zabbix > Administration > General > Autoregistration.
+ZABBIXHOSTMETADATA="Infrastructure-$ZABBIXHOSTNAME" # Your Host Metadata value. Please use this value in your Zabbix Server > Configuration > Actions > Autoregistration action
 
+# Additional Information
 
+# Config location:
+# /etc/zabbix/zabbix_agentd.conf
 
+# Useful command:
+# service zabbix-agent restart
 
+# Iptables command to whitelist Zabbix server and block others. Change the 127.0.0.1 IP to reflect your Zabbix IP.
+# iptables -A INPUT -s 127.0.0.1 -p tcp -m tcp --dport 10050 -j ACCEPT
+# iptables -A INPUT -s 127.0.0.1 -p tcp -m tcp --dport 10051 -j ACCEPT
+# iptables -A INPUT -p tcp -m tcp --dport 10050 -j DROP
+# iptables -A INPUT -p tcp -m tcp --dport 10051 -j DROP
+# sudo iptables -L
 
-
-
-
-# Script starts
+# Zabbix Install Script starts
 
 # Step 1 = Determines the OS Distribution
 # Step 2 = Determines the OS Version ID
@@ -50,27 +47,27 @@ ZABBIXHOSTMETADATA="YourHostMetadata" # Your Host Metadata value. Please use thi
 function editzabbixconf()
 {
 echo ========================================================================
-echo Step 3 = Downloading Zabbix Repository and Installing Zabbix-Agent	
+echo Step 3 = Downloading Zabbix Repository and Installing Zabbix-Agent
 echo !! 3 !! Zabbix-Agent Installed
 echo ========================================================================
 
 mv /etc/zabbix/zabbix_agentd.conf /etc/zabbix/zabbix_agentd.conf.original
-cp /etc/zabbix/zabbix_agentd.conf.original /etc/zabbix/zabbix_agentd.conf	
+cp /etc/zabbix/zabbix_agentd.conf.original /etc/zabbix/zabbix_agentd.conf
 sed -i "s+Server=127.0.0.1+Server=$SERVERIP+g" /etc/zabbix/zabbix_agentd.conf
 sed -i "s+ServerActive=127.0.0.1+ServerActive=$SERVERIP:10051+g" /etc/zabbix/zabbix_agentd.conf
 sed -i "s+Hostname=Zabbix server+Hostname=$ZABBIXHOSTNAME+g" /etc/zabbix/zabbix_agentd.conf
 sed -i "s+# Timeout=3+Timeout=30+g" /etc/zabbix/zabbix_agentd.conf
 
 echo ========================================================================
-echo Step 4 = Enable PSK Encryption & Autoregistration for Zabbix-Agent	
+echo Step 4 = Enable PSK Encryption and Autoregistration for Zabbix-Agent
 echo !! 4 !! Zabbix-Agent Installed
 echo ========================================================================
 
 touch $ZABBIXTLSFILELOCATION
 echo $ZABBIXPSKSECRET > $ZABBIXTLSFILELOCATION
-# openssl rand -hex 32 > $ZABBIXTLSFILELOCATION # Alternative method. To use random PSK value instead. Need to comment out line 69, 70, 30, which are 'touch $ZABBIXTLSFILELOCATION', 'echo $ZABBIXPSKSECRET > $ZABBIXTLSFILELOCATION', 'ZABBIXPSKSECRET=YOURRANDOMHEX'
 chown zabbix:zabbix $ZABBIXTLSFILELOCATION
 chmod 640 $ZABBIXTLSFILELOCATION
+
 sed -i "s+# TLSConnect=unencrypted+TLSConnect=psk+g" /etc/zabbix/zabbix_agentd.conf
 sed -i "s+# TLSAccept=unencrypted+TLSAccept=psk+g" /etc/zabbix/zabbix_agentd.conf
 sed -i "s+# TLSPSKIdentity=+TLSPSKIdentity=$ZABBIXTLSIDENTITY+g" /etc/zabbix/zabbix_agentd.conf
@@ -128,7 +125,7 @@ systemctl restart zabbix-agent
 
 function rhel6()
 {
-rpm -Uvh http://repo.zabbix.com/zabbix/6.0/rhel/6/x86_64/zabbix-release-6.0-4.el6.noarch.rpm 
+rpm -Uvh http://repo.zabbix.com/zabbix/6.0/rhel/6/x86_64/zabbix-release-6.0-4.el6.noarch.rpm
 yum clean all
 yum install zabbix-agent -y
 ifexitiszero
@@ -138,7 +135,7 @@ service zabbix-agent restart
 
 function rhel5()
 {
-rpm -Uvh http://repo.zabbix.com/zabbix/6.0/rhel/5/x86_64/zabbix-release-6.0-4.el5.noarch.rpm 
+rpm -Uvh http://repo.zabbix.com/zabbix/6.0/rhel/5/x86_64/zabbix-release-6.0-4.el5.noarch.rpm
 ifexitiszero
 chkconfig zabbix-agent on
 service zabbix-agent restart
@@ -198,6 +195,17 @@ apt install zabbix-agent -y
 ifexitiszero
 update-rc.d zabbix-agent enable
 service zabbix-agent restart
+}
+
+function debian12()
+{
+wget http://repo.zabbix.com/zabbix/6.0/debian/pool/main/z/zabbix-release/zabbix-release_latest+debian12_all.deb
+dpkg -i zabbix-release_latest+debian12_all.deb
+apt update
+apt install zabbix-agent -y
+ifexitiszero
+systemctl enable zabbix-agent
+systemctl restart zabbix-agent
 }
 
 function debian11()
@@ -265,10 +273,6 @@ systemctl restart zabbix-agent
 }
 
 
-
-
-
-
 #VERSION ID FUNCTION'S LISTED BELOW
 
 function version_id_red()
@@ -332,7 +336,9 @@ d2=$(echo $d1 | cut -c13- | rev | cut -c2- |rev)
 d3=$(echo $d2 | awk '{print int($1)}')
 #echo $d3       #prints os version id like this : 8
 
-if [[ $d3 -eq 10 ]];     then debian10
+if [[ $d3 -eq 12 ]];     then debian12
+elif [[ $d3 -eq 11 ]];   then debian11
+elif [[ $d3 -eq 10 ]];   then debian10
 elif [[ $d3 -eq 9 ]];    then debian9
 elif [[ $d3 -eq 8 ]];    then debian8
 else echo :-/ Failed at Step 2 : We"'"re Sorry. This script cannot be used for zabbix-agent installation on this machine && exit 0
@@ -376,13 +382,7 @@ fi
 }
 
 
-
-
-
-
-
 #STEP 1 - SCRIPT RUNS FROM BELOW
-
 
 echo Starting Zabbix-Agent Installation Script
 echo ========================================================================
@@ -422,7 +422,6 @@ else echo :-/ Failed at Step 1 : We"'"re Sorry. This script cannot be used for z
 fi
 
 
-
 #STEP 6
 echo ========================================================================
 echo Congrats. Zabbix-Agent Installion is completed successfully.
@@ -431,8 +430,6 @@ echo You can now add the host $ZABBIXHOSTNAME with IP $(hostname -i) on the Zabb
 echo Your TLS PSK Identity : $ZABBIXTLSIDENTITY 
 echo Your PSK Secret is stored at $ZABBIXTLSFILELOCATION
 echo Your HostMetadata : $ZABBIXHOSTMETADATA
-echo Thanks for using Bari"'"s zabbix-agent installation script.
-echo Visit https://github.com/bari86/zabbix-agent for more information.
 echo ========================================================================
 echo To check zabbix-agent service status, you may run : service zabbix-agent status
 echo To check zabbix-agent config, you may run : egrep -v '"^#|^$"' /etc/zabbix/zabbix_agentd.conf

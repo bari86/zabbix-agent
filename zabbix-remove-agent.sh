@@ -1,6 +1,5 @@
 #!/bin/bash
-
-
+# Script to remove zabbix agent automatically
 
 function version_redhat()
 {
@@ -27,9 +26,6 @@ zypper -n remove zabbix-agent*
 zypper -n remove zabbix-release*
 rm -rvf /etc/zabbix
 }
-
-
-
 
 echo Starting Zabbix-Agent Removal Script
 echo ==========================================================
@@ -62,7 +58,7 @@ else echo This script cannot be used for zabbix-agent removal on this machine &&
 
 fi
 
-echo ==========================================================
+echo =======================================================================
 
 echo Zabbix-Agent is Successfully Uninstalled and  Removed from this machine
 
@@ -70,4 +66,4 @@ echo Thanks for using Bari"'"s zabbix-agent removal script
 
 echo Host to be removed from Front End : $(hostname -f)
 
-echo ==========================================================
+echo =======================================================================

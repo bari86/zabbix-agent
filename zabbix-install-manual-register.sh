@@ -1,16 +1,16 @@
 #!/bin/bash
 
-# Zabbix Auto Install Script
-# Version 0.4
+# Zabbix Auto Install Script With Manual registration
+# Version Control V1.0
 
 # Please put in your Zabbix Server IP.
 SERVERIP="127.0.0.1"
 
 # Please put in your Zabbix Host name here. Alternatively you can comment the first line and uncomment the second line for it to use the server hostname.
-ZABBIXHOSTNAME="CustomNameHere"
+ZABBIXHOSTNAME="YourHostNameHere"
 # ZABBIXHOSTNAME="$(hostname -f)"
 
-# Script starts
+# Zabbix Install Script starts
 
 # Step 1 = Determines the OS Distribution
 # Step 2 = Determines the OS Version ID
@@ -155,6 +155,17 @@ update-rc.d zabbix-agent enable
 service zabbix-agent restart
 }
 
+function debian12()
+{
+wget http://repo.zabbix.com/zabbix/6.0/debian/pool/main/z/zabbix-release/zabbix-release_latest+debian12_all.deb
+dpkg -i zabbix-release_latest+debian12_all.deb
+apt update
+apt install zabbix-agent -y
+ifexitiszero
+systemctl enable zabbix-agent
+systemctl restart zabbix-agent
+}
+
 function debian11()
 {
 wget http://repo.zabbix.com/zabbix/6.0/debian/pool/main/z/zabbix-release/zabbix-release_latest+debian11_all.deb
@@ -287,7 +298,9 @@ d2=$(echo $d1 | cut -c13- | rev | cut -c2- |rev)
 d3=$(echo $d2 | awk '{print int($1)}')
 #echo $d3       #prints os version id like this : 8
 
-if [[ $d3 -eq 10 ]];     then debian10
+if [[ $d3 -eq 12 ]];     then debian12
+elif [[ $d3 -eq 11 ]];   then debian11
+elif [[ $d3 -eq 10 ]];   then debian10
 elif [[ $d3 -eq 9 ]];    then debian9
 elif [[ $d3 -eq 8 ]];    then debian8
 else echo :-/ Failed at Step 2 : We"'"re Sorry. This script cannot be used for zabbix-agent installation on this machine && exit 0
@@ -337,7 +350,6 @@ fi
 
 
 #STEP 1 - SCRIPT RUNS FROM BELOW
-
 
 echo Starting Zabbix-Agent Installation Script
 echo ========================================================================
