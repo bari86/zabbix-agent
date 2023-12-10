@@ -7,7 +7,7 @@
 ZABBIXHOSTNAME="YourHostNameHere" # Put in VM name where. This value appear exactly in Zabbix Host.
 
 # Change the PSK identity if needed. This is will be reflected on the Zabbix > Host > Host Group.
-ZABBIXTLSIDENTITY="Infrastructure" # Your PSK identity for SoothSayer.
+ZABBIXTLSIDENTITY="Infrastructure" # Your PSK identity.
 
 # Please put in your Zabbix Server IP.
 SERVERIP="127.0.0.1"
